@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <img src="./assets/logo.png">
-    <h1>我是中国</h1>
+    <h1>这是使用vue-cli脚手架初始化完成</h1>
     <router-view/>
   </div>
 </template>
