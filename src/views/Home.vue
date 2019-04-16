@@ -1,6 +1,6 @@
 <template>
   <div>
-    主页
+    主页已经跳到舍得
   </div>
 </template>
 <script>
