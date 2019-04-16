@@ -7,18 +7,21 @@
         </div>
       </el-form-item>
       <el-form-item prop="username">
-        <el-input v-model="form.uesrname" placeholder="账号" prefix-icon="myicon myicon-user"></el-input>
+        <el-input v-model="form.username" placeholder="账号" prefix-icon="myicon myicon-user" type="text"></el-input>
       </el-form-item>
       <el-form-item prop="password">
-        <el-input v-model="form.password" placeholder="密码" prefix-icon="myicon myicon-key"></el-input>
+        <el-input v-model="form.password" placeholder="密码" prefix-icon="myicon myicon-key" type="password"></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" class="login-btn">登录</el-button>
+        <el-button type="primary" class="login-btn" @click="loginSubmit('form')">登录</el-button>
       </el-form-item>
     </el-form>
   </div>
 </template>
 <script>
+//引入接口函数
+import {checkUser} from '@/api'
+
   export default {
     data() {
       return {
@@ -29,13 +32,35 @@
         rules: {
           username: [
             { required: true, message: '请输入账户名称', trigger: 'blur' },
-            { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
           ],
           password: [
             { required: true, message: '请输入密码', trigger: 'blur'}
           ]
+        }
       }
-      }
+    },
+    methods: {
+      loginSubmit(formName) {
+        this.$refs[formName].validate((valid) => {
+          //验证通过执行 this.form为参数
+          if (valid) {
+           checkUser(this.form).then(res => {
+            //  如果登录成功跳转至首页，失败弹出提示信息
+            if(res.meta.status === 200){
+              this.$router.push({name: 'Home'})
+            }else{
+              this.$message({
+                type: 'error',
+                message: res.meta.msg
+              })
+            }
+           }) 
+          } else {
+            console.log('验证失败');
+            return false;
+          }
+        });
+      },
     }
   }
 </script>
