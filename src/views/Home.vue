@@ -33,7 +33,7 @@
         <el-header>
           <i class="myicon myicon-menu toggle-btn" @click="toggleCollapse"></i>
           <div class="header-title">电商后台管理系统</div>
-          <span>您好，***
+          <span>您好，{{$store.getters.username}}
             <el-button type="text" @click="logout">退出</el-button>
           </span>
         </el-header>
