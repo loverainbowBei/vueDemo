@@ -1,12 +1,14 @@
 <template>
   <div class="home">
     <el-container>
-      <el-aside width="200px">
+      <!-- 侧边栏部分 -->
+      <el-aside width="auto">
         <div class="logo"></div>
         <!-- 侧边栏 -->
         <el-col :span="12">
           <el-menu
             default-active="2"
+            :collapse="isCollapse"
             class="el-menu-admin"
             @open="handleOpen"
             @close="handleClose"
@@ -26,9 +28,20 @@
           </el-menu>
         </el-col>
       </el-aside>
+      <!-- header部分 -->
       <el-container>
-        <el-header>Header</el-header>
-        <el-main>Main</el-main>
+        <el-header>
+          <i class="myicon myicon-menu toggle-btn" @click="toggleCollapse"></i>
+          <div class="header-title">电商后台管理系统</div>
+          <span>您好，***
+            <el-button type="text" @click="logout">退出</el-button>
+          </span>
+        </el-header>
+        <!-- main 部分 -->
+        <el-main>
+          <!-- router-view 存放main部分的页面 -->
+          <router-view></router-view>
+        </el-main>
       </el-container>
     </el-container>
   </div>
@@ -37,12 +50,26 @@
 //引入请求用户列表的接口
 import {getUserList} from '@/api'
 export default {
+  data(){
+    return{
+      isCollapse: false
+    }
+  },
   methods: {
       handleOpen(key, keyPath) {
         console.log(key, keyPath);
       },
       handleClose(key, keyPath) {
         console.log(key, keyPath);
+      },
+      toggleCollapse(){
+        this.isCollapse = !this.isCollapse
+      },
+      logout(){
+        //点击按钮，退出当前页面，即清除 token
+        localStorage.removeItem('mytoken');
+        //清除token后 回到登录页面
+        this.$router.push('/login')
       }
     },
   mounted(){
