@@ -46,7 +46,8 @@ import {checkUser} from '@/api'
           if (valid) {
            checkUser(this.form).then(res => {
             //  如果登录成功跳转至首页，失败弹出提示信息
-            if(res.meta.status === 200){
+            if(res.meta.status === 200){ 
+              localStorage.setItem('mytoken', res.data.token) //登录成功后 把token 保存到localStorage中
               this.$router.push({name: 'Home'})
             }else{
               this.$message({
