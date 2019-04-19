@@ -46,10 +46,9 @@ import {checkUser} from '@/api'
           if (valid) {
            checkUser(this.form).then(res => {
             //  如果登录成功跳转至首页，失败弹出提示信息
-            if(res.meta.status === 200){
-              //登录成功后 把token 保存到localStorage中,将username保存到vuex的state中
-              localStorage.setItem('mytoken', res.data.token) 
-              this.$store.commit('setUsername', res.data.username)
+            if(res.meta.status === 200){            
+              localStorage.setItem('mytoken', res.data.token) //登录成功后把token 保存到localStorage中,
+              this.$store.commit('setUsername', res.data.username)  //将username保存到vuex的state中
               this.$router.push({name: 'Home'})
             }else{
               this.$message({

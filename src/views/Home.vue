@@ -8,6 +8,7 @@
         <el-col :span="12">
           <el-menu
             default-active="2"
+            router
             :collapse="isCollapse"
             class="el-menu-admin"
             @open="handleOpen"
@@ -15,12 +16,12 @@
             background-color="#545c64"
             text-color="#fff"
             active-text-color="#ffd04b">
-            <el-submenu index="1">
+            <el-submenu>
               <template slot="title">
                 <i class="el-icon-location"></i>
                 <span>用户管理</span>
               </template>            
-                <el-menu-item index="2">
+                <el-menu-item index="/user">
                   <i class="el-icon-menu"></i>
                   <span slot="title">用户列表</span>
                 </el-menu-item>
