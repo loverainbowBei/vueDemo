@@ -22,22 +22,38 @@
     </el-row>
     <!-- 表格内容部分 -->
     <el-table
-      :data="tableData"
+      :data="userList"
       border
       style="width: 100%">
       <el-table-column
-        prop="date"
-        label="日期"
-        width="180">
+        type="index"
+        width="50">
       </el-table-column>
       <el-table-column
-        prop="name"
+        prop="username"
         label="姓名"
         width="180">
       </el-table-column>
       <el-table-column
-        prop="address"
-        label="地址">
+        prop="email"
+        label="邮件"
+        width="180">
+      </el-table-column>
+      <el-table-column
+        prop="mobile"
+        label="电话">
+      </el-table-column>
+      <el-table-column label="用户开关">
+        <template slot-scope="scope">
+          <el-switch v-model="value3">用户开关</el-switch>    <!-- 一个操作开关-->
+        </template>
+      </el-table-column>
+      <el-table-column label="操作">
+        <template slot-scope="scope">
+          <el-button size="mini" type="primary" icon="el-icon-edit" plain></el-button>
+          <el-button size="mini" type="danger" icon="el-icon-delete" plain></el-button>
+          <el-button size="mini" type="warning" icon="el-icon-check" plain></el-button>
+        </template>
       </el-table-column>
     </el-table>
     <!-- 底边分页部分 -->
@@ -58,27 +74,16 @@
 </template>
 
 <script>
+import {getUserList} from '../../api'  //或者写为: @/api
 export default {
   data() {
     return {
-      tableData: [{
-        date: '2016-05-02',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1518 弄'
-       }, {
-        date: '2016-05-04',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1517 弄'
-      }, {
-        date: '2016-05-01',
-         name: '王小虎',
-        address: '上海市普陀区金沙江路 1519 弄'
-      }, {
-        date: '2016-05-03',
-        name: '王小虎',
-        address: '上海市普陀区金沙江路 1516 弄'
-       }]
+      userList: [],
+      value3: true
      }
+  },
+  mounted(){  //在mounted钩子函数中调用initList
+    this.initList()
   },
   methods: {
     handleSizeChange(val) {
@@ -86,6 +91,12 @@ export default {
      },
     handleCurrentChange(val) {
       console.log(`当前页: ${val}`);
+    },
+    initList(){
+      getUserList({params: {query: '', pagenum: 1, pagesize: 4}}).then(res => {
+        console.log(res)
+        this.userList = res.data.users
+      })
     }
   }
 }
