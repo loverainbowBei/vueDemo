@@ -44,19 +44,19 @@ import {checkUser} from '@/api'
         this.$refs[formName].validate((valid) => {
           //验证通过执行 this.form为参数
           if (valid) {
-           checkUser(this.form).then(res => {
-            //  如果登录成功跳转至首页，失败弹出提示信息
-            if(res.meta.status === 200){            
-              localStorage.setItem('mytoken', res.data.token) //登录成功后把token 保存到localStorage中,
-              this.$store.commit('setUsername', res.data.username)  //将username保存到vuex的state中
-              this.$router.push({name: 'Home'})
-            }else{
-              this.$message({
-                type: 'error',
-                message: res.meta.msg
-              })
-            }
-           }) 
+            checkUser(this.form).then(res => {
+             //  如果登录成功跳转至首页，失败弹出提示信息
+              if(res.meta.status === 200){            
+                localStorage.setItem('mytoken', res.data.token) //登录成功后把token 保存到localStorage中,
+                this.$store.commit('setUsername', res.data.username)  //将username保存到vuex的state中
+                this.$router.push({name: 'Home'})
+              }else{
+                this.$message({
+                  type: 'error',
+                  message: res.meta.msg
+                })
+              }
+            }) 
           } else {
             console.log('验证失败');
             return false;

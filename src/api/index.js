@@ -34,5 +34,17 @@ export const changeUserState = params => {
     }
     //添加用户
 export const addUsername = params => {
-    return axios.post('users', params).then(res => res.data)
+        return axios.post('users', params).then(res => res.data)
+    }
+    //获取用户列表ID
+export const getUserId = params => {
+        return axios.get(`users/${params}`).then(res => res.data)
+    }
+    //获取编辑的用户列表
+export const editUserSubmit = params => {
+        return axios.put(`users/${params.id}`, params).then(res => res.data)
+    }
+    // 删除用户列表
+export const deleUser = params => {
+    return axios.delete(`users/${params}`).then(res => res.data)
 }

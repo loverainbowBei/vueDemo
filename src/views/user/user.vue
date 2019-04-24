@@ -37,7 +37,7 @@
       </el-table-column>
       <el-table-column
         prop="email"
-        label="邮件"
+        label="qq邮箱"
         width="180">
       </el-table-column>
       <el-table-column
@@ -52,8 +52,8 @@
       </el-table-column>
       <el-table-column label="操作">
         <template slot-scope="scope">
-          <el-button size="mini" type="primary" icon="el-icon-edit" plain></el-button>
-          <el-button size="mini" type="danger" icon="el-icon-delete" plain></el-button>
+          <el-button size="mini" type="primary" icon="el-icon-edit" plain @click="showFormDialog(scope.row)"></el-button>
+          <el-button size="mini" type="danger" icon="el-icon-delete" plain @click="showDeleDialog(scope.row)"></el-button>
           <el-button size="mini" type="warning" icon="el-icon-check" plain></el-button>
         </template>
       </el-table-column>
@@ -76,8 +76,27 @@
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
-      <el-button @click="dialogFormVisible = false">取 消</el-button>
+      <el-button @click="addFormDialog = false">取 消</el-button>
       <el-button type="primary" @click="addUserSubmit('addUserForm')">确 定</el-button>
+    </div>
+  </el-dialog>
+    <!-- 编辑用户对话框 -->
+  <el-dialog title="编辑账户" :visible.sync="editFormDialog">
+      <!-- ref="editUserForm"将表单命名为editUserForm，在点击确定按钮时，将该form表单作为参数传进去 -->
+    <el-form :model="editForm" label-width="80px" :rules="rules" ref="editUserForm">
+      <el-form-item label="用户名" prop="username">  <!--prop为校验字段 必须写 -->
+        <el-input v-model="editForm.username" autocomplete="off" :disabled="true" size="small"></el-input>
+      </el-form-item>
+      <el-form-item label="邮箱" prop="email">
+        <el-input v-model="editForm.email" autocomplete="off"></el-input>
+      </el-form-item>
+      <el-form-item label="电话" prop="mobile">
+        <el-input v-model="editForm.mobile" autocomplete="off"></el-input>
+      </el-form-item>
+    </el-form>
+    <div slot="footer" class="dialog-footer">
+      <el-button @click="editFormDialog = false">取 消</el-button>
+      <el-button type="primary" @click="editUserSubmit('editUserForm')">确 定</el-button>
     </div>
   </el-dialog>
     <!-- 底边分页部分 -->
@@ -87,8 +106,8 @@
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
           :current-page="1"
-          :page-sizes="[1, 2, 3, 4]"
-          :page-size="1"
+          :page-sizes="[10, 20, 30, 40]"
+          :page-size="10"
           layout="total, sizes, prev, pager, next, jumper"
           :total="total">
         </el-pagination>
@@ -98,22 +117,30 @@
 </template>
 
 <script>
-import {getUserList, changeUserState, addUsername} from '../../api'  //或者写为: @/api
+// 引入在路由中定义好的函数方法
+import {getUserList,changeUserState,addUsername,getUserId,editUserSubmit,deleUser} from '../../api'  //或者写为: @/api
 export default {
   data() {
     return {
       userList: [],
       total: 0,
-      pagesize: 1, //每页几条数据，默认一条 
+      pagesize: 10, //每页几条数据，默认一条 
       pagenum: 1,  //当前页
       query: '',
       addForm: {
         username: '',
         password: '',
         email: '',
-        mobile: ''
+        mobile: '',
+      },
+      editForm: {
+        username: '',
+        email: '',
+        mobile: '',
+        id: 0
       },
       addFormDialog: false,
+      editFormDialog: false,
       //添加用户表单的校验规则
       rules: {
         username: [
@@ -164,7 +191,7 @@ export default {
         if(res.meta.status === 200){
           this.$message({
             type: 'success',
-            message: '修改用户成功啦'
+            message: '更改用户状态成功啦'
           })
         }else{
           this.$message({
@@ -191,6 +218,67 @@ export default {
             this.initList()
           })
         }
+      })
+    },
+    //显示编辑对话框
+    showFormDialog(row){
+      this.editFormDialog = true
+      // console.log(row) 点击编辑按钮时执行此方法
+      getUserId(row.id).then(res => {
+        // console.log(res)
+        this.editForm.username = res.data.username
+        this.editForm.email = res.data.email
+        this.editForm.mobile = res.data.mobile
+        this.editForm.id = res.data.id  //将id也保存到数据中，方便线面获取
+      })
+    },
+    //编辑用户信息后提交
+    editUserSubmit(formName){
+      this.$refs[formName].validate(valide => {
+        if(valide){
+          editUserSubmit(this.editForm).then(res => {
+            console.log(res)
+            if(res.meta.status === 200){
+              this.$message({
+                type: 'success',
+                message: '更新数据成功了!'
+              })
+              this.editFormDialog = false
+              this.initList()
+            }else{
+              this.$message({
+                type: 'warning',
+                msg: res.meta.msg
+              })
+            }
+          })
+        }
+      })
+    },
+    //显示删除对话框
+    showDeleDialog(row){
+      // console.log(row)
+      this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          // 执行删除操作
+          deleUser(row.id).then(res => {
+            console.log(res)
+            if(res.meta.status === 200){
+              this.$message({
+                type: 'success',
+                message: '删除成功!'
+              })
+              this.initList()
+            }
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })          
       })
     }
   }
