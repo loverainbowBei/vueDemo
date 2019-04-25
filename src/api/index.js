@@ -46,5 +46,13 @@ export const editUserSubmit = params => {
     }
     // 删除用户列表
 export const deleUser = params => {
-    return axios.delete(`users/${params}`).then(res => res.data)
+        return axios.delete(`users/${params}`).then(res => res.data)
+    }
+    // 获取角色列表
+export const getRoleList = params => {
+        return axios.get('roles').then(res => res.data)
+    }
+    //分配角色
+export const playRole = params => {
+    return axios.put(`users/${params.id}/role`, { id: params.id, rid: params.rid }).then(res => res.data)
 }

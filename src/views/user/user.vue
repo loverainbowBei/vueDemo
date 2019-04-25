@@ -54,7 +54,7 @@
         <template slot-scope="scope">
           <el-button size="mini" type="primary" icon="el-icon-edit" plain @click="showFormDialog(scope.row)"></el-button>
           <el-button size="mini" type="danger" icon="el-icon-delete" plain @click="showDeleDialog(scope.row)"></el-button>
-          <el-button size="mini" type="warning" icon="el-icon-check" plain></el-button>
+          <el-button size="mini" type="warning" icon="el-icon-check" plain @click="showRoleDialog(scope.row)"></el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -99,6 +99,23 @@
       <el-button type="primary" @click="editUserSubmit('editUserForm')">确 定</el-button>
     </div>
   </el-dialog>
+      <!-- 分配角色对话框 -->
+  <el-dialog title="分配角色" :visible.sync="roleDialog">
+    <el-form :model="roleForm" label-width="120px">
+      <el-form-item label="当前用户">
+        <el-tag type="info">{{roleForm.username}}</el-tag>
+      </el-form-item>
+      <el-form-item label="请选择角色">
+        <el-select v-model="roleId" placeholder="请选择角色">
+          <el-option v-for="(role, index) in roles" :key="index" :label="role.roleName" :value="role.id"></el-option>
+        </el-select>
+      </el-form-item>
+    </el-form>
+    <div slot="footer" class="dialog-footer">
+      <el-button @click="roleDialog = false">取 消</el-button>
+      <el-button type="primary" @click="roleDialogSubmit">确 定</el-button>
+    </div>
+  </el-dialog>
     <!-- 底边分页部分 -->
     <el-row class="page">
       <el-col :span="24">
@@ -118,7 +135,7 @@
 
 <script>
 // 引入在路由中定义好的函数方法
-import {getUserList,changeUserState,addUsername,getUserId,editUserSubmit,deleUser} from '../../api'  //或者写为: @/api
+import {getUserList,changeUserState,addUsername,getUserId,editUserSubmit,deleUser,getRoleList,playRole} from '../../api'  //或者写为: @/api
 export default {
   data() {
     return {
@@ -127,6 +144,8 @@ export default {
       pagesize: 10, //每页几条数据，默认一条 
       pagenum: 1,  //当前页
       query: '',
+      roles: [],  //用于保存从服务器获取的角色
+      roleId: '',
       addForm: {
         username: '',
         password: '',
@@ -139,8 +158,10 @@ export default {
         mobile: '',
         id: 0
       },
+      roleForm: {},
       addFormDialog: false,
       editFormDialog: false,
+      roleDialog: false,
       //添加用户表单的校验规则
       rules: {
         username: [
@@ -187,8 +208,7 @@ export default {
     UserState(row){
       console.log(row)
       changeUserState({uId: row.id, type: row.mg_state}).then(res => {
-        console.log(res)
-        if(res.meta.status === 200){
+        if(res.meta.status ===200){
           this.$message({
             type: 'success',
             message: '更改用户状态成功啦'
@@ -279,6 +299,36 @@ export default {
             type: 'info',
             message: '已取消删除'
           })          
+      })
+    },
+    //显示分配角色对话框
+    showRoleDialog(row){
+       console.log(row)
+      this.roleForm = row
+      this.roleDialog = true
+      getRoleList().then(res => {
+        //  console.log(res)
+        if(res.meta.status === 200){
+          this.roles = res.data
+        }
+      })
+    },
+    //分配角色 点击确定按钮时执行
+    roleDialogSubmit(){
+      playRole({id: this.roleForm.id, rid: this.roleId}).then(res => {
+        // console.log(res)
+        if(res.meta.status === 200){
+          this.$message({
+            type: 'success',
+            message: '设置角色成功啦！'
+          })
+          this.roleDialog = false
+        }else{
+          this.$message({
+            type: 'error',
+            message: res.meta.msg
+          })
+        }
       })
     }
   }
