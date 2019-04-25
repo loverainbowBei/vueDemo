@@ -23,6 +23,7 @@
     </el-row>
     <!-- 表格内容部分 -->
     <el-table
+      v-loading="loading"
       :data="userList"
       border
       style="width: 100%">
@@ -146,6 +147,7 @@ export default {
       query: '',
       roles: [],  //用于保存从服务器获取的角色
       roleId: '',
+      loading: false, //绑定加载过度动画
       addForm: {
         username: '',
         password: '',
@@ -195,6 +197,7 @@ export default {
       this.initList()
     },
     initList(){
+      this.loading = true //在数据加载完成前 展示加载过度动画
       getUserList(
         {
           params: {query: this.query , pagenum: this.pagenum, pagesize: this.pagesize}}
@@ -203,6 +206,7 @@ export default {
           this.userList = res.data.users
           this.total = res.data.total
       })
+      this.loading = false  //在数据加载完成后 关闭加载过度动画 
     },
     //改变用户状态
     UserState(row){
@@ -315,21 +319,29 @@ export default {
     },
     //分配角色 点击确定按钮时执行
     roleDialogSubmit(){
-      playRole({id: this.roleForm.id, rid: this.roleId}).then(res => {
-        // console.log(res)
-        if(res.meta.status === 200){
-          this.$message({
-            type: 'success',
-            message: '设置角色成功啦！'
-          })
-          this.roleDialog = false
-        }else{
-          this.$message({
-            type: 'error',
-            message: res.meta.msg
-          })
-        }
-      })
+      if(!this.roleId){
+        this.$message({
+          type: 'warning',
+          message: '角色不能为空，请选择'
+        })
+      }else{
+        playRole({id: this.roleForm.id, rid: this.roleId}).then(res => {
+          // console.log(res)
+          if(res.meta.status === 200){
+            this.$message({
+              type: 'success',
+              message: '设置角色成功啦！'
+            })
+            this.roleId = ''
+            this.roleDialog = false
+          }else{
+            this.$message({
+              type: 'error',
+              message: res.meta.msg
+            })
+          }
+        })
+      }
     }
   }
 }
