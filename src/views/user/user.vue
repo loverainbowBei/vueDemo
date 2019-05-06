@@ -5,9 +5,8 @@
       <el-col :span="24">
         <el-breadcrumb separator-class="el-icon-arrow-right">
           <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-          <el-breadcrumb-item>活动管理</el-breadcrumb-item>
-          <el-breadcrumb-item>活动列表</el-breadcrumb-item>
-          <el-breadcrumb-item>活动详情</el-breadcrumb-item>
+          <el-breadcrumb-item><a href="/">用户管理</a></el-breadcrumb-item>
+          <el-breadcrumb-item>用户列表</el-breadcrumb-item>
         </el-breadcrumb>
       </el-col>
     </el-row>
@@ -22,29 +21,11 @@
       </el-col>
     </el-row>
     <!-- 表格内容部分 -->
-    <el-table
-      v-loading="loading"
-      :data="userList"
-      border
-      style="width: 100%">
-      <el-table-column
-        type="index"
-        width="50">
-      </el-table-column>
-      <el-table-column
-        prop="username"
-        label="姓名"
-        width="180">
-      </el-table-column>
-      <el-table-column
-        prop="email"
-        label="qq邮箱"
-        width="180">
-      </el-table-column>
-      <el-table-column
-        prop="mobile"
-        label="电话">
-      </el-table-column>
+    <el-table v-loading="loading" :data="userList" border style="width: 100%">
+      <el-table-column type="index" width="50"></el-table-column>
+      <el-table-column prop="username" label="姓名" width="180"></el-table-column>
+      <el-table-column prop="email" label="qq邮箱" width="180"></el-table-column>
+      <el-table-column prop="mobile" label="电话"></el-table-column>
       <el-table-column label="用户开关">
         <template slot-scope="scope">
           <!-- 一个操作开关-->
@@ -60,63 +41,63 @@
       </el-table-column>
     </el-table>
     <!-- 添加用户对话框 -->
-  <el-dialog title="添加账户" :visible.sync="addFormDialog">
-      <!-- ref="addUserForm"将表单命名为addUserForm，在点击确定按钮时，将该form表单作为参数传进去 -->
-    <el-form :model="addForm" label-width="80px" :rules="rules" ref="addUserForm">
-      <el-form-item label="用户名" prop="username">  <!--prop为校验字段 必须写 -->
-        <el-input v-model="addForm.username" autocomplete="off"></el-input>
-      </el-form-item>
-      <el-form-item label="密码" prop="password">
-        <el-input v-model="addForm.password" autocomplete="off"></el-input>
-      </el-form-item>
-      <el-form-item label="邮箱" prop="email">
-        <el-input v-model="addForm.email" autocomplete="off"></el-input>
-      </el-form-item>
-      <el-form-item label="电话" prop="mobile">
-        <el-input v-model="addForm.mobile" autocomplete="off"></el-input>
-      </el-form-item>
-    </el-form>
-    <div slot="footer" class="dialog-footer">
-      <el-button @click="addFormDialog = false">取 消</el-button>
-      <el-button type="primary" @click="addUserSubmit('addUserForm')">确 定</el-button>
-    </div>
-  </el-dialog>
+    <el-dialog title="添加账户" :visible.sync="addFormDialog">
+        <!-- ref="addUserForm"将表单命名为addUserForm，在点击确定按钮时，将该form表单作为参数传进去 -->
+      <el-form :model="addForm" label-width="80px" :rules="rules" ref="addUserForm">
+        <el-form-item label="用户名" prop="username">  <!--prop为校验字段 必须写 -->
+          <el-input v-model="addForm.username" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="密码" prop="password">
+          <el-input v-model="addForm.password" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱" prop="email">
+          <el-input v-model="addForm.email" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="电话" prop="mobile">
+          <el-input v-model="addForm.mobile" autocomplete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="addFormDialog = false">取 消</el-button>
+        <el-button type="primary" @click="addUserSubmit('addUserForm')">确 定</el-button>
+      </div>
+    </el-dialog>
     <!-- 编辑用户对话框 -->
-  <el-dialog title="编辑账户" :visible.sync="editFormDialog">
-      <!-- ref="editUserForm"将表单命名为editUserForm，在点击确定按钮时，将该form表单作为参数传进去 -->
-    <el-form :model="editForm" label-width="80px" :rules="rules" ref="editUserForm">
-      <el-form-item label="用户名" prop="username">  <!--prop为校验字段 必须写 -->
-        <el-input v-model="editForm.username" autocomplete="off" :disabled="true" size="small"></el-input>
-      </el-form-item>
-      <el-form-item label="邮箱" prop="email">
-        <el-input v-model="editForm.email" autocomplete="off"></el-input>
-      </el-form-item>
-      <el-form-item label="电话" prop="mobile">
-        <el-input v-model="editForm.mobile" autocomplete="off"></el-input>
-      </el-form-item>
-    </el-form>
-    <div slot="footer" class="dialog-footer">
-      <el-button @click="editFormDialog = false">取 消</el-button>
-      <el-button type="primary" @click="editUserSubmit('editUserForm')">确 定</el-button>
-    </div>
-  </el-dialog>
+    <el-dialog title="编辑账户" :visible.sync="editFormDialog">
+        <!-- ref="editUserForm"将表单命名为editUserForm，在点击确定按钮时，将该form表单作为参数传进去 -->
+      <el-form :model="editForm" label-width="80px" :rules="rules" ref="editUserForm">
+        <el-form-item label="用户名" prop="username">  <!--prop为校验字段 必须写 -->
+          <el-input v-model="editForm.username" autocomplete="off" :disabled="true" size="small"></el-input>
+        </el-form-item>
+        <el-form-item label="邮箱" prop="email">
+          <el-input v-model="editForm.email" autocomplete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="电话" prop="mobile">
+          <el-input v-model="editForm.mobile" autocomplete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="editFormDialog = false">取 消</el-button>
+        <el-button type="primary" @click="editUserSubmit('editUserForm')">确 定</el-button>
+      </div>
+    </el-dialog>
       <!-- 分配角色对话框 -->
-  <el-dialog title="分配角色" :visible.sync="roleDialog">
-    <el-form :model="roleForm" label-width="120px">
-      <el-form-item label="当前用户">
-        <el-tag type="info">{{roleForm.username}}</el-tag>
-      </el-form-item>
-      <el-form-item label="请选择角色">
-        <el-select v-model="roleId" placeholder="请选择角色">
-          <el-option v-for="(role, index) in roles" :key="index" :label="role.roleName" :value="role.id"></el-option>
-        </el-select>
-      </el-form-item>
-    </el-form>
-    <div slot="footer" class="dialog-footer">
-      <el-button @click="roleDialog = false">取 消</el-button>
-      <el-button type="primary" @click="roleDialogSubmit">确 定</el-button>
-    </div>
-  </el-dialog>
+    <el-dialog title="分配角色" :visible.sync="roleDialog">
+      <el-form :model="roleForm" label-width="120px">
+        <el-form-item label="当前用户">
+          <el-tag type="info">{{roleForm.username}}</el-tag>
+        </el-form-item>
+        <el-form-item label="请选择角色">
+          <el-select v-model="roleId" placeholder="请选择角色">
+            <el-option v-for="(role, index) in roles" :key="index" :label="role.roleName"   :value="role.id"></el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="roleDialog = false">取 消</el-button>
+        <el-button type="primary" @click="roleDialogSubmit">确 定</el-button>
+      </div>
+    </el-dialog>
     <!-- 底边分页部分 -->
     <el-row class="page">
       <el-col :span="24">
@@ -307,7 +288,7 @@ export default {
     },
     //显示分配角色对话框
     showRoleDialog(row){
-       console.log(row)
+      //  console.log(row)
       this.roleForm = row
       this.roleDialog = true
       getRoleList().then(res => {

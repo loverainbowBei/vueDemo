@@ -1,5 +1,5 @@
 <template>
-  <div>欢迎登陆</div>
+  <div>欢迎登陆这是welcome.vue</div>
 </template>
 
 <script>
