@@ -18,6 +18,7 @@
     </el-row>
     <!-- 表格 -->
     <tree-grid
+      v-loading="loading"
       class="margin-15"
       :treeStructure="true"
       :columns="columns"
@@ -43,11 +44,11 @@
     <!-- 添加分类对话框 -->
     <el-dialog title="添加分类" :visible.sync="addCateDialog">
       <el-form :model="addForm" label-width="80px" :rules="rules" ref="addCateForm">
-        <el-form-item label="分类名称" prop="catename">  <!--prop为校验字段 必须写 -->
-          <el-input v-model="addForm.username" autocomplete="off"></el-input>
+        <el-form-item label="分类名称" prop="cat_name">  <!--prop为校验字段 必须写 -->
+          <el-input v-model="addForm.cat_name" autocomplete="off"></el-input>
         </el-form-item>
         <el-form-item label="商品类别">
-          <el-cascader :options="options" v-model="selectedOptions" @change="handleChange"></el-cascader>
+          <el-cascader :options="options" v-model="selectedOptions" @change="handleChange" :props="props"></el-cascader>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -59,19 +60,26 @@
 </template>
 <script> 
 import TreeGrid from '../../components/TreeGrid/TreeGrid'
-import {getCategories} from '../../api/index'
+import {getCategories, addCategories} from '../../api/index'
 export default {
   data () {
     return {
       dataSource: [],
       total: 0,
+      loading: false,
       pagesize: 10, //每页几条数据，默认一条 
       pagenum: 1,  //当前页
       addCateDialog: false,  //点击添加分类弹出对话框
       options: [],   //级联选择器中的数据
-      selectedOptions: [],  //级联选择器选中的数据 
+      selectedOptions: [],  //级联选择器中选中的数据 
+      props: {    //配置级联选择器要展示的数据字段
+        value: 'cat_id',
+        label: 'cat_name'
+      }, 
       addForm: {
-        catename: ''
+        cat_name: '',
+        cat_pid: 0,
+        cat_level: 0
       },
       columns: [
         {
@@ -110,25 +118,62 @@ export default {
       handleSizeChange(val) {  // 分页中的事件
       console.log(`每页 ${val} 条`);
       this.pagesize = val
-      this.initList()
+      this.initCateList()
      },
       handleCurrentChange(val) {   //分页中的事件
       console.log(`当前页: ${val}`);
       this.pagenum = val
-      this.initList()
+      this.initCateList()
     },
     handleChange(value) {   //对话框的选中事件
       console.log(value);
     },
-    addCate(){  //点击添加商品分类按钮事件
+    addCate(){    //点击添加商品分类按钮事件
       this.addCateDialog = true
+       getCategories({type: '2'}).then(res => {
+         if(res.meta.status === 200){
+           console.log(res);
+           this.options = res.data
+         }
+       })
+    },
+    addCateSubmit(formName){
+      this.$refs[formName].validate(valied => {
+        if(valied){
+          if(this.selectedOptions.length === 0){
+            this.addForm.cat_pid = 0
+            this.addForm.cat_level = 0
+          }else if (this.selectedOptions.length === 1){
+            this.addForm.cat_pid = this.selectedOptions[this.selectedOptions.length - 1]
+             this.addForm.cat_level = 1
+          }else {
+            this.addForm.cat_pid = this.selectedOptions[this.selectedOptions.length - 1]
+            this.addForm.cat_level = 2
+          }
+          addCategories(this.addForm).then(res => {
+            if(res.meta.status === 201){
+              // console.log(res);
+              this.addCateDialog = false
+              this.$message({
+                type: 'success',
+                message: '添加分类成功！'
+              })    
+              this.addForm.cat_name = '',
+              this.selectedOptions = []
+            }
+          })
+        }
+      })
+
     },
     initCateList(){
+      this.loading = true
       getCategories({type: '3', pagesize: this.pagesize, pagenum: this.pagenum}).then(res => {
-        console.log(res);
+        // console.log(res);
         if(res.meta.status === 200) {
           this.total = res.data.total
           this.dataSource = res.data.result
+          this.loading = false
         }
       })
     }

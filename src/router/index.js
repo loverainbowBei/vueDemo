@@ -7,6 +7,8 @@ import User from '../views/user/user'
 import Right from '../views/rights/Right'
 import Role from '../views/rights/Role'
 import Categories from '../views/categories/Categories'
+import Goods from '@/views/goods/Goods'
+import addGoods from '../views/goods/addGoods'
 
 Vue.use(Router)
 
@@ -46,6 +48,16 @@ export default new Router({
                     name: 'Categories',
                     path: 'categories',
                     component: Categories
+                },
+                {
+                    name: 'Goods',
+                    path: 'goods',
+                    component: Goods
+                },
+                {
+                    name: 'addGoods',
+                    path: 'toadd', //这里的路径必须和后台给的的路径一致
+                    component: addGoods
                 }
             ]
         }

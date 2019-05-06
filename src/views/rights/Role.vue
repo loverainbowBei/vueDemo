@@ -69,32 +69,62 @@
         <template slot-scope="scope">
           <el-button size="mini" type="primary" icon="el-icon-edit" plain></el-button>
           <el-button size="mini" type="danger" icon="el-icon-delete" plain></el-button>
-          <el-button size="mini" type="warning" icon="el-icon-check" plain></el-button>
+          <el-button size="mini" type="warning" icon="el-icon-check" plain title="授权角色" @click="roleRightDialog(scope.row)"></el-button>
         </template>
       </el-table-column>
     </el-table>
+    <!-- 授权角色对话框 -->
+    <el-dialog title="授权角色" :visible.sync="dialogRoleVisible">
+      <div class="treeContainer">
+        <el-tree 
+          :data="rightData" 
+          show-checkbox 
+          ref="tree"
+          node-key="id"
+          :default-expand-all="true"
+          :default-checked-keys="selectedRights"
+          :props="defaultProps">
+        </el-tree>
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogRoleVisible= false">取 消</el-button>
+        <el-button type="primary" @click="submitRight">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 <script>
-import {getRoleList, deleteRoleRight} from '@/api'
+import {getRoleList, deleteRoleRight, getRightList, addRoleRight} from '@/api'
 export default {
   data() {
     return {
       loading: false,
-      rolesData: []
+      rolesData: [],
+      dialogRoleVisible: false,
+      rightData: [],
+      defaultProps: {
+        children: 'children',
+        label: 'authName'
+      },
+      selectedRights: [],  //保存已经选择的项目的id
+      currentRole: {}  //保存点击的角色
     }
   },
   created(){
-    this.loading = true
-     getRoleList().then(res => {
-      //  console.log(res)
-      if(res.meta.status === 200){
-        this.rolesData = res.data
-        this.loading = false
-      }     
-    })
+    this.initRoleList()
   },
   methods: {
+    //初始化授权列表
+    initRoleList(){
+      this.loading = true
+      getRoleList().then(res => {
+        //  console.log(res)
+        if(res.meta.status === 200){
+          this.rolesData = res.data
+          this.loading = false
+        }     
+      })
+    },
     deleteRight(row, rightId){
       //console.log(role.id, rightId)  //roleId 获取的是这个角色的数据
       deleteRoleRight({roleId: row.id,  rightId: rightId}).then(res => {
@@ -108,6 +138,51 @@ export default {
           })
         }
       })
+    },
+    roleRightDialog(row){
+      this.dialogRoleVisible = true
+      this.currentRole = row   //row 代表当前的角色，把他储存到currentRole中
+      getRightList({type: 'tree'}).then(res => {
+        if(res.meta.status === 200){
+          // console.log(res);
+          this.rightData = res.data
+        }else{
+          this.$message({
+            type: 'error',
+            message: res.meta.msg
+          })
+        }
+      })
+      //遍历之前，清空已选择的权限
+      this.selectedRights.length = 0
+      //取出当前角色的所有权限，然后遍历到他的第三个children，取出他里面的所有项的id，放到selectedRight中
+      this.currentRole.children.forEach(first => {
+        if(first.children && first.children.length !== 0){
+          first.children.forEach(second => {
+            if(second.children && second.children.length !== 0){
+              second.children.forEach(third => {
+                this.selectedRights.push(third.id) 
+              })
+            }
+          })
+        }
+      })
+    },
+    //为角色添加权限
+    submitRight(){
+      //this.$refs.tree.getCheckedKeys() 获取当前角色现有的权限， join 将其转化为字符串并且用逗号隔开
+      let rids = this.$refs.tree.getCheckedKeys().join(',')
+      console.log(rids);
+      addRoleRight(this.currentRole.id, {rids: rids}).then(res => {
+        if(res.meta.status === 200){
+          this.$message({
+            type: 'success',
+            message: '授权成功啦' 
+          })
+          this.dialogRoleVisible = false
+          this.initRoleList()
+        }
+      })   
     }
   }
 }
@@ -117,6 +192,10 @@ export default {
     .el-tag{
       margin-left: 10px;
       margin-bottom: 10px;
+    }
+    .treeContainer {
+      height: 300px;
+      overflow: auto;
     }
   }
 </style>
